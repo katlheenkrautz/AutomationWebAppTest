@@ -41,12 +41,8 @@ The automated tests cover the entire taxi ordering process, including:
 pytest
 
 📄 Project Structure
-graphql
-Copy
-Edit
+
 qa-project-Urban-Routes-es/
 ├── data.py                 # Contains server configuration and base URL
 ├── main.py                 # Main file with test definitions
-├── pages/                  # Folder with UrbanRoutesPage class
-├── tests/                  # Folder for organizing test cases (optional)
 └── README.md               # This file
