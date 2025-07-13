@@ -5,12 +5,13 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver import DesiredCapabilities
 
-
-# No modificar
+# Do not modify this function
 def retrieve_phone_code(driver) -> str:
-    """Este código devuelve un número de confirmación de teléfono y lo devuelve como un string.
-    Utilízalo cuando la aplicación espere el código de confirmación para pasarlo a tus pruebas.
-    El código de confirmación del teléfono solo se puede obtener después de haberlo solicitado en la aplicación."""
+    """
+    Retrieves the phone verification code from browser logs.
+    Use this only after the code has been requested within the application.
+    Returns the code as a string.
+    """
     import json
     import time
     from selenium.common import WebDriverException
@@ -28,108 +29,118 @@ def retrieve_phone_code(driver) -> str:
             time.sleep(1)
             continue
         if not code:
-            raise Exception("No se encontró el código de confirmación del teléfono.\n"
-                            "Utiliza 'retrieve_phone_code' solo después de haber solicitado el código en tu aplicación.")
+            raise Exception("Phone verification code not found.\n"
+                            "Use 'retrieve_phone_code' only after the code has been requested in your application.")
         return code
 
-
+# Page Object Model for the Urban Routes web app
 class UrbanRoutesPage:
-    # Localizadores de los campos
+    # Element locators
     from_field = (By.ID, 'from')
     to_field = (By.ID, 'to')
-    comfort_fare_button = (By.ID, 'comfort-fare')  # **Se agregó el localizador para la tarifa Comfort**
-    phone_field = (By.ID, 'phone')  # **Se agregó el localizador para el campo de teléfono**
-    card_input_field = (By.ID, 'code')  # **Se agregó el localizador para el campo CVV de tarjeta**
-    link_button = (By.ID, 'link')  # **Se agregó el localizador para el botón "Link"**
-    message_field = (By.ID, 'controller-message')  # **Se agregó el localizador para el campo de mensaje al controlador**
-    blanket_checkbox = (By.ID, 'blanket')  # **Se agregó el localizador para la manta**
-    tissues_checkbox = (By.ID, 'tissues')  # **Se agregó el localizador para los pañuelos**
-    ice_cream_button = (By.ID, 'ice-cream')  # **Se agregó el localizador para el botón de helado**
-    taxi_search_modal = (By.ID, 'taxi-search-modal')  # **Se agregó el localizador para el modal de búsqueda de taxi**
-    driver_info_modal = (By.ID, 'driver-info-modal')  # **Se agregó el localizador para el modal de información del conductor**
+    comfort_fare_button = (By.ID, 'comfort-fare')  # Comfort fare button
+    phone_field = (By.ID, 'phone')  # Phone number input field
+    card_input_field = (By.ID, 'code')  # CVV input field
+    link_button = (By.ID, 'link')  # Link card button
+    message_field = (By.ID, 'controller-message')  # Driver message input
+    blanket_checkbox = (By.ID, 'blanket')  # Blanket checkbox
+    tissues_checkbox = (By.ID, 'tissues')  # Tissues checkbox
+    ice_cream_button = (By.ID, 'ice-cream')  # Ice cream request button
+    taxi_search_modal = (By.ID, 'taxi-search-modal')  # Taxi search modal
+    driver_info_modal = (By.ID, 'driver-info-modal')  # Driver info modal
 
     def __init__(self, driver):
         self.driver = driver
 
+    # Set origin address
     def set_from(self, from_address):
         self.driver.find_element(*self.from_field).send_keys(from_address)
 
+    # Set destination address
     def set_to(self, to_address):
         self.driver.find_element(*self.to_field).send_keys(to_address)
 
+    # Get origin address from input
     def get_from(self):
         return self.driver.find_element(*self.from_field).get_property('value')
 
+    # Get destination address from input
     def get_to(self):
         return self.driver.find_element(*self.to_field).get_property('value')
 
-    # **Paso 2: Método para seleccionar la tarifa Comfort**
+    # Step 2: Select the Comfort fare
     def select_comfort_fare(self):
         comfort_button = self.driver.find_element(*self.comfort_fare_button)
         comfort_button.click()
 
-    # **Paso 3: Método para rellenar el número de teléfono**
+    # Step 3: Enter phone number
     def set_phone_number(self, phone_number):
         self.driver.find_element(*self.phone_field).send_keys(phone_number)
 
-    # **Paso 4: Método para agregar tarjeta de crédito**
+    # Step 4: Add credit card details
     def add_credit_card(self, card_number, expiration_date, cvv):
         self.driver.find_element(By.ID, 'card-number').send_keys(card_number)
         self.driver.find_element(By.ID, 'expiration-date').send_keys(expiration_date)
         self.driver.find_element(*self.card_input_field).send_keys(cvv)
 
-        # Simular el clic para cambiar de foco (enfoque fuera del campo CVV)
+        # Click outside to trigger validation
         self.driver.find_element(By.TAG_NAME, 'body').click()
 
-        # **Esperar a que el botón 'Link' se active antes de hacer clic**
+        # Wait until the 'Link' button becomes clickable and click it
         WebDriverWait(self.driver, 10).until(
             expected_conditions.element_to_be_clickable(self.driver.find_element(*self.link_button))
         )
         self.driver.find_element(*self.link_button).click()
 
-    # **Paso 5: Método para escribir mensaje al controlador**
+    # Step 5: Write a message to the driver
     def write_controller_message(self, message):
         self.driver.find_element(*self.message_field).send_keys(message)
 
-    # **Paso 6: Método para pedir manta y pañuelos**
+    # Step 6: Request blanket and tissues
     def request_blanket_and_tissues(self):
         self.driver.find_element(*self.blanket_checkbox).click()
         self.driver.find_element(*self.tissues_checkbox).click()
 
-    # **Paso 7: Método para pedir helados**
+    # Step 7: Request a number of ice creams
     def request_ice_creams(self, quantity):
         for _ in range(quantity):
             self.driver.find_element(*self.ice_cream_button).click()
 
-    # **Paso 8: Método para esperar el modal de búsqueda de taxi**
+    # Step 8: Wait for the taxi search modal to appear
     def wait_for_taxi_modal(self):
         WebDriverWait(self.driver, 10).until(
             expected_conditions.visibility_of_element_located(self.taxi_search_modal)
         )
 
-    # **Paso 9: Método para esperar la información del conductor**
+    # Step 9: Wait for the driver info modal to appear
     def wait_for_driver_info(self):
         WebDriverWait(self.driver, 10).until(
             expected_conditions.visibility_of_element_located(self.driver_info_modal)
         )
 
 
+# Test class using Pytest or unittest-style setup/teardown
 class TestUrbanRoutes:
 
     driver = None
 
     @classmethod
     def setup_class(cls):
-        # Configurar el navegador con logging habilitado
+        """
+        Sets up the browser with performance logging enabled before running the tests.
+        """
         capabilities = DesiredCapabilities.CHROME
         capabilities["goog:loggingPrefs"] = {'performance': 'ALL'}
         cls.driver = webdriver.Chrome(desired_capabilities=capabilities)
 
     def test_request_taxi(self):
+        """
+        Full end-to-end test: fill in trip details, choose fare, enter payment and extras, and wait for driver modal.
+        """
         self.driver.get(data.urban_routes_url)
         routes_page = UrbanRoutesPage(self.driver)
 
-        # Paso 1: Configurar dirección
+        # Step 1: Set trip origin and destination
         address_from = data.address_from
         address_to = data.address_to
         routes_page.set_from(address_from)
@@ -137,33 +148,35 @@ class TestUrbanRoutes:
         assert routes_page.get_from() == address_from
         assert routes_page.get_to() == address_to
 
-        # **Paso 2: Seleccionar tarifa Comfort**
+        # Step 2: Select Comfort fare
         routes_page.select_comfort_fare()
 
-        # **Paso 3: Rellenar número de teléfono**
+        # Step 3: Enter phone number
         phone_number = "123456789"
         routes_page.set_phone_number(phone_number)
 
-        # **Paso 4: Agregar tarjeta de crédito**
+        # Step 4: Add credit card
         routes_page.add_credit_card("4111111111111111", "12/25", "123")
 
-        # **Paso 5: Escribir mensaje para el controlador**
+        # Step 5: Write message to the driver
         controller_message = "Llevarme rápido"
         routes_page.write_controller_message(controller_message)
 
-        # **Paso 6: Pedir manta y pañuelos**
+        # Step 6: Request blanket and tissues
         routes_page.request_blanket_and_tissues()
 
-        # **Paso 7: Pedir 2 helados**
+        # Step 7: Request 2 ice creams
         routes_page.request_ice_creams(2)
 
-        # **Paso 8: Esperar modal de búsqueda de taxi**
+        # Step 8: Wait for the taxi search modal to appear
         routes_page.wait_for_taxi_modal()
 
-        # **Paso 9: Esperar la información del conductor**
+        # Step 9: Wait for the driver info modal to appear
         routes_page.wait_for_driver_info()
 
     @classmethod
     def teardown_class(cls):
+        """
+        Closes the browser after all tests have completed.
+        """
         cls.driver.quit()
-
