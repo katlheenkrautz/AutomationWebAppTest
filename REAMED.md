@@ -43,6 +43,6 @@ pytest
 📄 Project Structure
 
 qa-project-Urban-Routes-es/
-├── data.py                 # Contains server configuration and base URL
-├── main.py                 # Main file with test definitions
-└── README.md               # This file
+- data.py                 # Contains server configuration and base URL
+- main.py                 # Main file with test definitions
+- README.md               # This file
