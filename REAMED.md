@@ -1,4 +1,4 @@
-#Project: Urban Routes – Automated Testing
+## Project: Urban Routes – Automated Testing
 
 This project is part of Sprint 8 of the TripleTen bootcamp. It focuses on automating tests for the **Urban Routes** web application, simulating the complete flow of ordering a taxi from the user's perspective.
 
@@ -31,3 +31,22 @@ The automated tests cover the entire taxi ordering process, including:
 
    ```bash
    git clone git@github.com:your-username/qa-project-Urban-Routes-es.git
+
+2. Open the project in PyCharm or your preferred editor.
+
+3. Replace the base URL in the data.py file with the Urban Routes server URL you received.
+
+4. Run the tests using:
+
+pytest
+
+📄 Project Structure
+graphql
+Copy
+Edit
+qa-project-Urban-Routes-es/
+├── data.py                 # Contains server configuration and base URL
+├── main.py                 # Main file with test definitions
+├── pages/                  # Folder with UrbanRoutesPage class
+├── tests/                  # Folder for organizing test cases (optional)
+└── README.md               # This file
